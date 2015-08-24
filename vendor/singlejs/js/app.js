@@ -1,5 +1,5 @@
-define(["require", "jquery", 'singlejs/system', 'routes', 'singlejs/dependencyResolverFor'],
-  function (require, $, system, routes, dependencyResolverFor) {
+define(['require', 'jquery', 'system', 'routes'],
+  function (require, $, system, routes) {
 
     /**
      * @class  AppModule
@@ -17,11 +17,6 @@ define(["require", "jquery", 'singlejs/system', 'routes', 'singlejs/dependencyRe
       title: 'singlejsApp',
 
       /**
-       * @property {string} default route
-       */
-      entrance: '/',
-
-      /**
        * @property {string} selection query for app host dom element
        */
       appHost: '#applicationHost',
@@ -32,13 +27,26 @@ define(["require", "jquery", 'singlejs/system', 'routes', 'singlejs/dependencyRe
       layout: 'app/layout/layout.html',
 
       /**
+       * @property {array} angular dependencies
+       */
+      ngDependencies: ['ngRoute'],
+
+      /**
        * @property {object} angular application
        */
-      ngApp: null,
+      ngApp: function (angularApp) {
+        if(angularApp){
+          system.ngApps["ngApp_" + self.name] = angularApp;
+        }
+        return system.ngApps["ngApp_" + self.name];
+      },
 
 
+      /**
+       * @method Config angular application
+       */
       configAngular: function(){
-        var ngApp = this.ngApp;
+        var ngApp = this.ngApp();
 
         ngApp.config(
         [
@@ -59,14 +67,32 @@ define(["require", "jquery", 'singlejs/system', 'routes', 'singlejs/dependencyRe
 
               //  $locationProvider.html5Mode(true);
 
-                if(routes.routes !== undefined)
+              //config routes
+              if(routes.routes !== undefined)
                 {
+                    //add routes
                     angular.forEach(routes.routes, function(route, path)
                     {
-                        $routeProvider.when(path, {templateUrl:route.templateUrl, resolve:dependencyResolverFor(route.dependencies)});
+                        $routeProvider.when(path, {
+                          templateUrl:route.templateUrl,
+                          resolve: ['$q','$rootScope', function($q, $rootScope)
+                          {
+                              var deferred = $q.defer();
+                              //use require to lazy load controller dependencies
+                              require(route.dependencies, function()
+                              {
+                                  $rootScope.$apply(function()
+                                  {
+                                      deferred.resolve();
+                                  });
+                              });
+
+                              return deferred.promise;
+                          }]
+                        });
                     });
                 }
-
+                //default route
                 if(routes.defaultRoutePaths !== undefined)
                 {
                     $routeProvider.otherwise({redirectTo:routes.defaultRoutePaths});
@@ -87,23 +113,18 @@ define(["require", "jquery", 'singlejs/system', 'routes', 'singlejs/dependencyRe
          system.log("Application: Starting");
 
          //set title
-         if(this.title){
-           document.title = this.title;
+         if(self.title){
+           document.title = self.title;
          }
 
-         //set angular app
-         var hostElem = $(this.appHost);
+         //load layout then setup angualar
          return $.get(this.layout, function(ret){
-            //log started
-            system.log("Application: Started");
 
-            //bootstrap angular
-            window["ngApp_" + self.name] = angular.module(self.name, ['ngRoute']);
-            self.ngApp = window["ngApp_" + self.name];
-
+            //Create Angular Application
+            self.ngApp(angular.module(self.name, self.ngDependencies));
 
             //append to appHost
-            hostElem
+            $(self.appHost)
               //load layout
               .html(ret)
               //set ng-app
@@ -113,11 +134,14 @@ define(["require", "jquery", 'singlejs/system', 'routes', 'singlejs/dependencyRe
             //config angular
             self.configAngular();
 
-
-            //var ngApp = angular.module(self.name);
+            //bootstrap angular
             angular.element(document).ready(function() {
               angular.bootstrap(document, [self.name]);
             });
+
+
+            //log started
+            system.log("Application: Started");
 
           });
 

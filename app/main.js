@@ -1,26 +1,39 @@
-﻿requirejs.config({
-    paths: {
-        'singlejs': '../vendor/singlejs/js',
-        'angular': '../vendor/angular/angular.min',
-        'angular-route': '../vendor/angular/angular-route.min',
-        'materialize': '../vendor/materialize/js/materialize.min',
-        'jquery': '../vendor/jquery/jquery-2.1.4.min',
+//config requirejs﻿
+requirejs.config({
+  paths: {
+    //angular libraries
+    'angular': '../vendor/angular/angular.min',
+    'angular-route': '../vendor/angular/angular-route.min',
 
-        'modules': 'modules',
-      },
-      shim: {
-          'materialize': {
-              deps: ['jquery'],
-              exports: 'jQuery'
-         },
-         'angular-route': {
-             deps: ['angular'],
-             exports: 'angular'
-        }
-      }
+    //jquery and materialize
+    'jquery': '../vendor/jquery/jquery-2.1.4.min',
+    'materialize': '../vendor/materialize/js/materialize.amd',
+    'hammer': '../vendor/hammer/hammer.min',
+    'velocity': '../vendor/velocity/velocity.min',
+
+    //singlejs
+    'app': '../vendor/singlejs/js/app',
+    'system': '../vendor/singlejs/js/system',
+
+    //application own modules
+    'modules': 'modules'
+  },
+  shim: {
+     'materialize': {
+          deps: ['jquery', 'hammer', 'velocity']
+     },
+     'angular-route': {
+         deps: ['angular']
+     },
+     'app': {
+        deps: ['jquery','angular-route']
+     }
+
+  }
 });
 
-define(['singlejs/system', 'singlejs/app', 'singlejs/router'],  function (system, app, router) {
+//startup
+define(['system', 'app', 'materialize'],  function (system, app, materialize) {
     //>>excludeStart("build", true);
     system.debug(true);
     //>>excludeEnd("build");
@@ -28,15 +41,10 @@ define(['singlejs/system', 'singlejs/app', 'singlejs/router'],  function (system
     //app title
     app.title = 'SingleJS';
 
-    //router.map
-    router.map = [
-      {route:'/', view: "/app/modules/welcome.view", controller: 'welcome', controllerFile: 'modules/welcome.controller'},
-      {route:'/view1', view: "/app/modules/view1.view", controller: 'view1', controllerFile: 'modules/view1.controller'}
-    ];
-
     //start application
     app.start()
       .then(function() {
         //application started
+
       });
 });

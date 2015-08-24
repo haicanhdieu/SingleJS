@@ -1,12 +1,12 @@
 define(["app"], function(app){
   //Register controller
-  app.ngApp().controller('welcome',['$scope',function($scope){
+  app.ngApp().controller('view2',['$scope',function($scope){
       //Start Controller content
       //=>
 
       $scope.page =
       {
-          heading: 'Welcome'
+          heading: 'View 2'
       };
 
       //<=|

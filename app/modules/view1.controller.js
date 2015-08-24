@@ -1,15 +1,15 @@
-define(["singlejs/app"], function(app){
+define(["app"], function(app){
+  //Register controller
+  app.ngApp().controller('view1',['$scope',function($scope){
+      //Start Controller content
+      //=>
 
-  app.ngApp.controller('view1',
-    [
-        '$scope',
+      $scope.page =
+      {
+          heading: 'View 1'
+      };
 
-        function($scope)
-        {
-            $scope.page =
-            {
-                heading: 'View 1'
-            };
-        }
-    ]);
+      //<=|
+      //End controller content
+  }]);
 })

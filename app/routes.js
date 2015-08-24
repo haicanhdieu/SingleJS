@@ -15,6 +15,12 @@ define([], function()
                     'modules/view1.controller'
                 ]
             },
+            '/view2': {
+                templateUrl: '/app/modules/view2.view.html',
+                dependencies: [
+                    'modules/view2.controller'
+                ]
+            },
         }
     };
 });
