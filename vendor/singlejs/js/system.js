@@ -65,10 +65,17 @@ define(['require', 'jquery'], function(require, $) {
    */
   var system = {
       /**
-       * Durandal's version.
+       * SingleJS's version.
        * @property {string} version
        */
       version: "0.0.1",
+
+
+      /**
+       * @property {object} Angualar application collection
+       */
+      ngApps: {},
+
       /**
        * A noop function.
        * @method noop
@@ -110,6 +117,7 @@ define(['require', 'jquery'], function(require, $) {
        */
       error: noop,
 
+
       /**
        * Creates a deferred object which can be used to create a promise. Optionally pass a function action to perform which will be passed an object used in resolving the promise.
        * @method defer
@@ -119,7 +127,7 @@ define(['require', 'jquery'], function(require, $) {
       defer: function(action) {
           return $.Deferred(action);
       },
-      
+
   }
 
 
